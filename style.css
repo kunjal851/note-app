@@ -1765,3 +1765,34 @@ select:focus-visible {
   .empty-state { min-height: 185px; }
   .note-card::before { width: 68px; }
 }
+
+/* -----------------------------
+   Fixes: Missing selectors referenced in HTML
+   - Add minimal utility/selectors to repair UI mismatches
+   ----------------------------- */
+
+/* Small muted text utility used in AI suggestions */
+.text-muted { color: var(--text-3); font-size: .88rem; font-weight: 600; }
+
+/* Auth screen wrapper (HTML uses .auth-screen) — mirror existing auth-backdrop behavior */
+.auth-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  background: radial-gradient(circle at 50% 12%, rgba(245,212,188,.55), transparent 18rem), var(--bg);
+}
+.auth-screen.hidden { display: none; }
+
+/* Header inside auth card */
+.auth-card-header { display:flex; gap:.6rem; align-items:center; margin-bottom:.6rem; }
+
+/* Actions row inside auth form */
+.auth-actions { display:flex; gap:.6rem; justify-content:flex-end; align-items:center; }
+
+/* Ensure emoji inputs render correctly in small viewports */
+.emoji-input { font-size:1.1rem; }
+
