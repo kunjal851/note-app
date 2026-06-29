@@ -40,7 +40,7 @@ import { firebaseConfig, USE_LOCAL_AUTH } from "./firebase-config.js";
   let auth = null;
   let db = null;
 
-  const useLocalAuth = Boolean(USE_LOCAL_AUTH);
+  const useLocalAuth = Boolean(USE_LOCAL_AUTH) || !firebaseConfig;
 
   if (!useLocalAuth) {
     app = initializeApp(firebaseConfig);
@@ -174,6 +174,8 @@ import { firebaseConfig, USE_LOCAL_AUTH } from "./firebase-config.js";
   };
 
   function init() {
+    // Start locked (signed out) until auth state resolves
+    setSignedOutUI();
     applyTheme(THEME_LIGHT);
     bindEvents();
     updateHero();
@@ -297,24 +299,22 @@ import { firebaseConfig, USE_LOCAL_AUTH } from "./firebase-config.js";
   }
 
   function watchAuth() {
-    const onAuthStateChangedFn = useLocalAuth ? window.__LocalAuth.onAuthStateChanged : onAuthStateChanged;
-    onAuthStateChangedFn(auth, async (user) => {
-      cleanupRealtimeListeners();
-      state.user = user;
-      state.notes = [];
-      state.folders = [];
-      state.selectedFolderId = null;
-      state.editingNoteId = null;
+    cleanupRealtimeListeners();
+    if (useLocalAuth) {
+      window.__LocalAuth.onAuthStateChanged(async (user) => {
+        state.user = user;
+        state.notes = [];
+        state.folders = [];
+        state.selectedFolderId = null;
+        state.editingNoteId = null;
 
-      if (!user) {
-        setSignedOutUI();
-        render();
-        return;
-      }
+        if (!user) {
+          setSignedOutUI();
+          render();
+          return;
+        }
 
-      setSignedInUI(user);
-      if (useLocalAuth) {
-        // Load folders/notes from localStorage for local testing
+        setSignedInUI(user);
         const payload = JSON.parse(localStorage.getItem(`noteflow_data_${user.uid}`) || "null");
         if (payload) {
           state.folders = payload.folders || [];
@@ -326,13 +326,29 @@ import { firebaseConfig, USE_LOCAL_AUTH } from "./firebase-config.js";
         state.isSyncing = false;
         setSyncStatus("Local mode");
         render();
-      } else {
+      });
+    } else {
+      onAuthStateChanged(auth, async (user) => {
+        cleanupRealtimeListeners();
+        state.user = user;
+        state.notes = [];
+        state.folders = [];
+        state.selectedFolderId = null;
+        state.editingNoteId = null;
+
+        if (!user) {
+          setSignedOutUI();
+          render();
+          return;
+        }
+
+        setSignedInUI(user);
         setSyncStatus("Syncing...");
         state.isSyncing = true;
         await ensureDefaultFolders();
         startRealtimeSync();
-      }
-    });
+      });
+    }
   }
 
   async function handleAuthSubmit(event) {
@@ -402,18 +418,20 @@ import { firebaseConfig, USE_LOCAL_AUTH } from "./firebase-config.js";
   }
 
   function setSignedInUI(user) {
-    els.authBackdrop.classList.add("hidden");
-    els.appShell.classList.remove("auth-locked");
-    els.logoutBtn.classList.remove("hidden");
-    els.userChip.classList.remove("hidden");
-    els.userChip.textContent = user.displayName || user.email;
+    if (els.authBackdrop) els.authBackdrop.classList.add("hidden");
+    if (els.appShell) els.appShell.classList.remove("auth-locked");
+    if (els.logoutBtn) els.logoutBtn.classList.remove("hidden");
+    if (els.userChip) {
+      els.userChip.classList.remove("hidden");
+      els.userChip.textContent = user.displayName || user.email;
+    }
   }
 
   function setSignedOutUI() {
-    els.authBackdrop.classList.remove("hidden");
-    els.appShell.classList.add("auth-locked");
-    els.logoutBtn.classList.add("hidden");
-    els.userChip.classList.add("hidden");
+    if (els.authBackdrop) els.authBackdrop.classList.remove("hidden");
+    if (els.appShell) els.appShell.classList.add("auth-locked");
+    if (els.logoutBtn) els.logoutBtn.classList.add("hidden");
+    if (els.userChip) els.userChip.classList.add("hidden");
     setSyncStatus("Offline");
     applyTheme(THEME_LIGHT);
   }

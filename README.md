@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # 🌸 NoteFlow — Complete Enhancement Package
 
 ## What You Have
@@ -528,3 +529,6 @@ You have everything needed to build a beautiful, feature-rich planner:
 *Last Updated: June 2026*
 *NoteFlow Enhanced Package v1.0*
 *All features documented, tested, and ready to implement*
+=======
+# note-app
+>>>>>>> 376516e5b10ce17eb17a888b2d1999bd9cee675d

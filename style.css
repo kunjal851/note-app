@@ -4,6 +4,27 @@
    Maintains scrapbook aesthetic and design tokens
    ============================================================ */
 
+  :root {
+    --bg: #F5EFE7;
+    --surface: #FFFDFB;
+    --bg-alt: #FFF7EE;
+    --accent: #E8894E;
+    --accent-dark: #D4662A;
+    --accent-light: #FFE7A8;
+    --text-1: #2C2C2C;
+    --text-2: #6B6B6B;
+    --text-3: #9A9A9A;
+    --border: rgba(0,0,0,0.06);
+    --border-soft: rgba(0,0,0,0.03);
+    --radius-sm: 8px;
+    --radius-md: 10px;
+    --radius-lg: 12px;
+    --radius-xl: 18px;
+    --ease-out: cubic-bezier(.22,.9,.36,1);
+    --scrap-lemon: #FFE7A8;
+  }
+
+
 /* ─── STREAK CARD (Dashboard) ─────────────────────────────── */
 .streak-card {
   background:
