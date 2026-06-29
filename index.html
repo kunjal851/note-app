@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="NoteFlow — Your cozy, beautiful planner for goals, notes, and habits" />
+  <meta name="theme-color" content="#F5EFE7" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="light" />
+  <meta name="apple-mobile-web-app-title" content="NoteFlow" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><text y='160' font-size='180' fill='%23E8A87C'>🌸</text></svg>" />
+  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><text y='160' font-size='180' fill='%23E8A87C'>🌸</text></svg>" />
+  <link rel="manifest" href="manifest.json" />
+  <title>NoteFlow — Your Cozy Planner</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Playfair+Display:wght@600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Scrapbook atmosphere -->
+  <div class="loading-screen" id="loadingScreen" aria-hidden="true">
+    <div class="loading-card">
+      <div class="loading-flower">🌸</div>
+      <div class="loading-title">NoteFlow</div>
+      <div class="loading-dots"><span></span><span></span><span></span></div>
+    </div>
+  </div>
+  <div class="scrapbook-decor" aria-hidden="true">
+    <span class="decor-flower flower-a">✿</span>
+    <span class="decor-flower flower-b">❀</span>
+    <span class="decor-flower flower-c">✽</span>
+    <span class="decor-petal petal-a"></span>
+    <span class="decor-petal petal-b"></span>
+    <span class="decor-tape tape-a"></span>
+    <span class="decor-tape tape-b"></span>
+  </div>
+
+  <!-- AUTH -->
+  <div class="auth-backdrop" id="authBackdrop">
+    <section class="auth-card" aria-labelledby="authTitle">
+      <div class="auth-brand">
+        <span class="brand-icon">ðŸŒ¸</span>
+        <span class="brand-name">NoteFlow</span>
+      </div>
+      <h1 class="auth-title" id="authTitle">Welcome back</h1>
+      <p class="auth-subtitle" id="authSubtitle">Log in to open your dashboard.</p>
+      <form class="auth-form" id="authForm" data-mode="login">
+        <label class="auth-field hidden" id="authNameField">
+          <span>Name</span>
+          <input type="text" id="authName" autocomplete="name" placeholder="Your name" />
+        </label>
+        <label class="auth-field">
+          <span>Email</span>
+          <input type="email" id="authEmail" autocomplete="email" placeholder="you@example.com" required />
+        </label>
+        <label class="auth-field">
+          <span>Password</span>
+          <input type="password" id="authPassword" autocomplete="current-password" placeholder="At least 6 characters" minlength="6" required />
+        </label>
+        <p class="auth-error hidden" id="authError"></p>
+        <button class="btn-primary auth-submit" id="authSubmit" type="submit">Log In</button>
+      </form>
+      <button class="auth-toggle" id="authToggle" type="button">Create an account</button>
+    </section>
+  </div>
+
+  <!-- ───────────── MOBILE OVERLAY ───────────── -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- ───────────── APP SHELL ───────────── -->
+  <div class="app-shell">
+
+    <!-- ══════════ SIDEBAR ══════════ -->
+    <aside class="sidebar" id="sidebar">
+
+      <!-- Brand -->
+      <div class="sidebar-brand">
+        <span class="brand-icon">🌸</span>
+        <span class="brand-name">NoteFlow</span>
+        <button class="sidebar-close-btn" id="sidebarCloseBtn" aria-label="Close sidebar">✕</button>
+      </div>
+
+      <!-- Search -->
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="searchInput" class="search-input" placeholder="Search notes…" autocomplete="off" />
+        <button class="search-clear" id="searchClear" aria-label="Clear search">✕</button>
+      </div>
+
+      <!-- Nav -->
+      <nav class="sidebar-nav">
+        <button class="nav-item active" data-view="dashboard">
+          <span class="nav-icon">🏠</span><span>Dashboard</span>
+        </button>
+        <button class="nav-item" data-view="all">
+          <span class="nav-icon">📋</span><span>All Notes</span>
+          <span class="nav-badge" id="allNotesBadge">0</span>
+        </button>
+        <button class="nav-item" data-view="today">
+          <span class="nav-icon">☀️</span><span>Today</span>
+          <span class="nav-badge" id="todayBadge">0</span>
+        </button>
+        <button class="nav-item" data-view="upcoming">
+          <span class="nav-icon">📅</span><span>Upcoming</span>
+          <span class="nav-badge" id="upcomingBadge">0</span>
+        </button>
+        <button class="nav-item" data-view="calendar">
+          <span class="nav-icon">🗓️</span><span>Calendar</span>
+        </button>
+        <button class="nav-item" data-view="goals">
+          <span class="nav-icon">🎯</span><span>Goals</span>
+          <span class="nav-badge" id="goalsBadge">0</span>
+        </button>
+        <button class="nav-item" data-view="habits">
+          <span class="nav-icon">🔥</span><span>Habits & Streaks</span>
+          <span class="nav-badge" id="habitsBadge">0</span>
+        </button>
+        <button class="nav-item" data-view="analytics">
+          <span class="nav-icon">📊</span><span>Analytics</span>
+        </button>
+      </nav>
+
+      <!-- Folders -->
+      <div class="sidebar-section">
+        <div class="sidebar-section-header">
+          <span>Folders</span>
+          <button class="add-folder-btn" id="addFolderBtn" aria-label="Add folder">＋</button>
+        </div>
+        <ul class="folder-list" id="folderList"></ul>
+      </div>
+
+      <!-- Dark mode toggle & Settings -->
+      <div class="sidebar-footer">
+        <button class="btn-settings" id="settingsBtn" aria-label="Settings">⚙️ Settings</button>
+        <label class="theme-toggle" aria-label="Toggle dark mode">
+          <input type="checkbox" id="themeToggle" />
+          <span class="toggle-track">
+            <span class="toggle-sun">☀️</span>
+            <span class="toggle-moon">🌙</span>
+            <span class="toggle-thumb"></span>
+          </span>
+          <span class="toggle-label">Dark mode</span>
+        </label>
+      </div>
+
+    </aside>
+    <!-- /SIDEBAR -->
+
+    <!-- ══════════ MAIN AREA ══════════ -->
+    <main class="main-area">
+
+      <!-- Top bar -->
+      <header class="topbar">
+        <button class="hamburger" id="hamburgerBtn" aria-label="Open sidebar">
+          <span></span><span></span><span></span>
+        </button>
+        <div class="topbar-title" id="topbarTitle">Dashboard</div>
+        <div class="topbar-actions">
+          <span class="user-chip hidden" id="userChip"></span>
+          <button class="btn-new-note" id="newNoteBtn">＋ New Note</button>
+          <button class="btn-ghost logout-btn hidden" id="logoutBtn">Logout</button>
+        </div>
+      </header>
+
+      <!-- ── VIEWS ── -->
+      <div class="views-container">
+
+        <!-- DASHBOARD VIEW -->
+        <section class="view active" id="view-dashboard">
+          <div class="dashboard-hero">
+            <div class="hero-text">
+              <p class="hero-greeting" id="heroGreeting">Good morning ☀️</p>
+              <h1 class="hero-date" id="heroDate"></h1>
+            </div>
+            <div class="hero-stats">
+              <div class="stat-chip">
+                <span class="stat-num" id="statTotal">0</span>
+                <span class="stat-label">Total notes</span>
+              </div>
+              <div class="stat-chip">
+                <span class="stat-num" id="statToday">0</span>
+                <span class="stat-label">Due today</span>
+              </div>
+              <div class="stat-chip">
+                <span class="stat-num" id="statFolders">0</span>
+                <span class="stat-label">Folders</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Daily Streak Section -->
+          <div class="dash-section">
+            <div class="section-header">
+              <h2>Your Streak 🔥</h2>
+            </div>
+            <div class="streak-card" id="streakCard">
+              <div class="streak-number" id="streakCount">0</div>
+              <div class="streak-label">Days</div>
+              <p class="streak-text">Keep it going!</p>
+            </div>
+          </div>
+
+          <!-- AI Suggestions -->
+          <div class="dash-section">
+            <div class="section-header">
+              <h2>AI Suggestions 🤖</h2>
+            </div>
+            <div class="ai-suggestions" id="aiSuggestions">
+              <p class="text-muted">Loading suggestions...</p>
+            </div>
+          </div>
+
+          <!-- Mini Calendar strip -->
+          <div class="dash-section">
+            <div class="section-header">
+              <h2>This Week</h2>
+            </div>
+            <div class="week-strip" id="weekStrip"></div>
+          </div>
+
+          <!-- Today's tasks -->
+          <div class="dash-section">
+            <div class="section-header">
+              <h2>Today's Notes</h2>
+              <button class="see-all-btn" data-view="today">See all →</button>
+            </div>
+            <div class="notes-grid small" id="todayNotes"></div>
+            <div class="empty-state hidden" id="todayEmpty">
+              <div class="empty-illo">🌿</div>
+              <p>Nothing due today — enjoy your day!</p>
+              <button class="btn-ghost" id="addTodayNote">Add a note for today</button>
+            </div>
+          </div>
+
+          <!-- Upcoming tasks -->
+          <div class="dash-section">
+            <div class="section-header">
+              <h2>Upcoming</h2>
+              <button class="see-all-btn" data-view="upcoming">See all →</button>
+            </div>
+            <div class="notes-grid small" id="upcomingNotes"></div>
+            <div class="empty-state hidden" id="upcomingEmpty">
+              <div class="empty-illo">🌱</div>
+              <p>No upcoming notes — you're all caught up!</p>
+            </div>
+          </div>
+
+        </section>
+        <!-- /DASHBOARD VIEW -->
+
+        <!-- ALL NOTES VIEW -->
+        <section class="view" id="view-all">
+          <div class="view-header">
+            <h2 class="view-title">All Notes</h2>
+            <div class="view-controls">
+              <button class="sort-btn active" data-sort="newest">Newest</button>
+              <button class="sort-btn" data-sort="oldest">Oldest</button>
+              <button class="sort-btn" data-sort="az">A–Z</button>
+            </div>
+          </div>
+          <div class="notes-grid" id="allNotesGrid"></div>
+          <div class="empty-state hidden" id="allEmpty">
+            <div class="empty-illo">📝</div>
+            <p>No notes yet — create your first one!</p>
+            <button class="btn-primary" id="allEmptyNew">＋ New Note</button>
+          </div>
+        </section>
+
+        <!-- TODAY VIEW -->
+        <section class="view" id="view-today">
+          <div class="view-header">
+            <h2 class="view-title">Today</h2>
+          </div>
+          <div class="notes-grid" id="todayGrid"></div>
+          <div class="empty-state hidden" id="todayGridEmpty">
+            <div class="empty-illo">☀️</div>
+            <p>Nothing scheduled for today.</p>
+            <button class="btn-primary" id="todayEmptyNew">＋ Add for Today</button>
+          </div>
+        </section>
+
+        <!-- UPCOMING VIEW -->
+        <section class="view" id="view-upcoming">
+          <div class="view-header">
+            <h2 class="view-title">Upcoming</h2>
+          </div>
+          <div class="notes-grid" id="upcomingGrid"></div>
+          <div class="empty-state hidden" id="upcomingGridEmpty">
+            <div class="empty-illo">🗓️</div>
+            <p>No upcoming notes.</p>
+          </div>
+        </section>
+
+        <!-- FOLDER VIEW -->
+        <section class="view" id="view-folder">
+          <div class="view-header">
+            <h2 class="view-title" id="folderViewTitle">Folder</h2>
+            <button class="btn-danger-sm" id="deleteFolderBtn">Delete folder</button>
+          </div>
+          <div class="notes-grid" id="folderNotesGrid"></div>
+          <div class="empty-state hidden" id="folderEmpty">
+            <div class="empty-illo">📁</div>
+            <p>This folder is empty.</p>
+            <button class="btn-primary" id="folderEmptyNew">＋ Add Note Here</button>
+          </div>
+        </section>
+
+        <!-- CALENDAR VIEW -->
+        <section class="view" id="view-calendar">
+          <div class="calendar-layout">
+            <div class="calendar-pane">
+              <div class="cal-header">
+                <button class="cal-nav" id="calPrev">‹</button>
+                <h2 class="cal-month-label" id="calMonthLabel"></h2>
+                <button class="cal-nav" id="calNext">›</button>
+              </div>
+              <div class="cal-grid" id="calGrid"></div>
+            </div>
+            <div class="calendar-sidebar">
+              <h3 class="cal-day-title" id="calDayTitle">Select a day</h3>
+              <div class="notes-grid" id="calDayNotes"></div>
+              <div class="empty-state hidden" id="calDayEmpty">
+                <div class="empty-illo">🌸</div>
+                <p>No notes on this day.</p>
+                <button class="btn-primary" id="calDayNew">＋ Add Note</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SEARCH RESULTS VIEW -->
+        <section class="view" id="view-search">
+          <div class="view-header">
+            <h2 class="view-title">Search Results</h2>
+          </div>
+          <div class="notes-grid" id="searchGrid"></div>
+          <div class="empty-state hidden" id="searchEmpty">
+            <div class="empty-illo">🔍</div>
+            <p>No notes match your search.</p>
+          </div>
+        </section>
+
+        <!-- GOALS VIEW -->
+        <section class="view" id="view-goals">
+          <div class="view-header">
+            <h2 class="view-title">🎯 Goals</h2>
+            <button class="btn-primary" id="newGoalBtn">＋ New Goal</button>
+          </div>
+          <div class="goals-container" id="goalsContainer"></div>
+          <div class="empty-state hidden" id="goalsEmpty">
+            <div class="empty-illo">🎯</div>
+            <p>No goals yet — set one to get started!</p>
+            <button class="btn-primary" id="goalsEmptyNew">＋ Create Goal</button>
+          </div>
+        </section>
+
+        <!-- HABITS & STREAKS VIEW -->
+        <section class="view" id="view-habits">
+          <div class="view-header">
+            <h2 class="view-title">🔥 Habits & Streaks</h2>
+            <button class="btn-primary" id="newHabitBtn">＋ New Habit</button>
+          </div>
+          <div class="habits-container" id="habitsContainer"></div>
+          <div class="empty-state hidden" id="habitsEmpty">
+            <div class="empty-illo">🔥</div>
+            <p>No habits tracked yet — build one today!</p>
+            <button class="btn-primary" id="habitsEmptyNew">＋ Create Habit</button>
+          </div>
+        </section>
+
+        <!-- ANALYTICS VIEW -->
+        <section class="view" id="view-analytics">
+          <div class="view-header">
+            <h2 class="view-title">📊 Analytics Dashboard</h2>
+            <div class="view-controls">
+              <button class="time-filter active" data-period="week">Week</button>
+              <button class="time-filter" data-period="month">Month</button>
+              <button class="time-filter" data-period="year">Year</button>
+            </div>
+          </div>
+          <div class="analytics-grid">
+            <div class="analytics-card">
+              <h3>Notes Created</h3>
+              <div class="chart-placeholder" id="notesChart">📊</div>
+              <p class="stat-value" id="statNotesCreated">0</p>
+            </div>
+            <div class="analytics-card">
+              <h3>Productivity</h3>
+              <div class="chart-placeholder" id="productivityChart">📈</div>
+              <p class="stat-value" id="statProductivity">0%</p>
+            </div>
+            <div class="analytics-card">
+              <h3>Goals Completed</h3>
+              <div class="chart-placeholder" id="goalsChart">🎯</div>
+              <p class="stat-value" id="statGoalsCompleted">0</p>
+            </div>
+            <div class="analytics-card">
+              <h3>Habit Consistency</h3>
+              <div class="chart-placeholder" id="habitChart">🔥</div>
+              <p class="stat-value" id="statHabitConsistency">0%</p>
+            </div>
+          </div>
+          <div class="analytics-section">
+            <h3>Weekly Heatmap</h3>
+            <div class="heatmap" id="heatmap"></div>
+          </div>
+          <div class="analytics-section">
+            <h3>Recent Activity</h3>
+            <div class="activity-log" id="activityLog"></div>
+          </div>
+        </section>
+
+      </div>
+      <!-- /VIEWS -->
+
+    </main>
+    <!-- /MAIN AREA -->
+
+  </div>
+  <!-- /APP SHELL -->
+
+  <!-- ══════════ NOTE MODAL ══════════ -->
+  <div class="modal-backdrop hidden" id="noteModalBackdrop">
+    <div class="modal note-modal" id="noteModal" role="dialog" aria-modal="true" aria-label="Note editor">
+      <div class="modal-header">
+        <span class="modal-title-label" id="modalMode">New Note</span>
+        <button class="modal-close" id="noteModalClose" aria-label="Close">✕</button>
+      </div>
+      <div class="modal-body">
+        <input type="text" id="noteTitle" class="note-title-input" placeholder="Note title…" maxlength="120" />
+        <textarea id="noteContent" class="note-content-input" placeholder="Write something wonderful…"></textarea>
+        <div class="note-meta-row">
+          <div class="meta-field">
+            <label for="noteFolder">📁 Folder</label>
+            <select id="noteFolder" class="meta-select"></select>
+          </div>
+          <div class="meta-field">
+            <label for="noteDate">📅 Date</label>
+            <input type="date" id="noteDate" class="meta-select" />
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-ghost" id="noteModalCancel">Cancel</button>
+        <button class="btn-primary" id="noteModalSave">Save Note</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ FOLDER MODAL ══════════ -->
+  <div class="modal-backdrop hidden" id="folderModalBackdrop">
+    <div class="modal folder-modal" role="dialog" aria-modal="true" aria-label="New folder">
+      <div class="modal-header">
+        <span class="modal-title-label">New Folder</span>
+        <button class="modal-close" id="folderModalClose" aria-label="Close">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="emoji-row" id="folderEmojiRow">
+          <button class="emoji-opt active" data-emoji="📁">📁</button>
+          <button class="emoji-opt" data-emoji="📂">📂</button>
+          <button class="emoji-opt" data-emoji="🗂️">🗂️</button>
+          <button class="emoji-opt" data-emoji="📚">📚</button>
+          <button class="emoji-opt" data-emoji="💼">💼</button>
+          <button class="emoji-opt" data-emoji="🎯">🎯</button>
+          <button class="emoji-opt" data-emoji="💡">💡</button>
+          <button class="emoji-opt" data-emoji="🌿">🌿</button>
+          <button class="emoji-opt" data-emoji="⭐">⭐</button>
+          <button class="emoji-opt" data-emoji="🎨">🎨</button>
+        </div>
+        <input type="text" id="folderName" class="note-title-input" placeholder="Folder name…" maxlength="40" />
+        <div class="color-row" id="folderColorRow">
+          <button class="color-opt active" data-color="#E8A87C" style="background:#E8A87C"></button>
+          <button class="color-opt" data-color="#F4C6A0" style="background:#F4C6A0"></button>
+          <button class="color-opt" data-color="#A8C5A0" style="background:#A8C5A0"></button>
+          <button class="color-opt" data-color="#A0B8C5" style="background:#A0B8C5"></button>
+          <button class="color-opt" data-color="#C5A0C0" style="background:#C5A0C0"></button>
+          <button class="color-opt" data-color="#C5C5A0" style="background:#C5C5A0"></button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-ghost" id="folderModalCancel">Cancel</button>
+        <button class="btn-primary" id="folderModalSave">Create Folder</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ GOAL MODAL ══════════ -->
+  <div class="modal-backdrop hidden" id="goalModalBackdrop">
+    <div class="modal goal-modal" role="dialog" aria-modal="true" aria-label="Goal editor">
+      <div class="modal-header">
+        <span class="modal-title-label" id="goalModalMode">New Goal</span>
+        <button class="modal-close" id="goalModalClose" aria-label="Close">✕</button>
+      </div>
+      <div class="modal-body">
+        <input type="text" id="goalTitle" class="note-title-input" placeholder="Goal title…" maxlength="100" />
+        <textarea id="goalDescription" class="note-content-input" placeholder="Describe your goal…" rows="4"></textarea>
+        <div class="note-meta-row">
+          <div class="meta-field">
+            <label for="goalCategory">🎯 Category</label>
+            <select id="goalCategory" class="meta-select">
+              <option value="health">🏃 Health</option>
+              <option value="career">💼 Career</option>
+              <option value="personal">🌱 Personal</option>
+              <option value="learning">📚 Learning</option>
+              <option value="finance">💰 Finance</option>
+              <option value="other">✨ Other</option>
+            </select>
+          </div>
+          <div class="meta-field">
+            <label for="goalDeadline">📅 Deadline</label>
+            <input type="date" id="goalDeadline" class="meta-select" />
+          </div>
+        </div>
+        <div class="note-meta-row">
+          <div class="meta-field">
+            <label for="goalPriority">⭐ Priority</label>
+            <select id="goalPriority" class="meta-select">
+              <option value="low">Low</option>
+              <option value="medium" selected>Medium</option>
+              <option value="high">High</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-ghost" id="goalModalCancel">Cancel</button>
+        <button class="btn-primary" id="goalModalSave">Save Goal</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ HABIT MODAL ══════════ -->
+  <div class="modal-backdrop hidden" id="habitModalBackdrop">
+    <div class="modal habit-modal" role="dialog" aria-modal="true" aria-label="Habit tracker">
+      <div class="modal-header">
+        <span class="modal-title-label" id="habitModalMode">New Habit</span>
+        <button class="modal-close" id="habitModalClose" aria-label="Close">✕</button>
+      </div>
+      <div class="modal-body">
+        <input type="text" id="habitName" class="note-title-input" placeholder="Habit name…" maxlength="50" />
+        <div class="note-meta-row">
+          <div class="meta-field">
+            <label for="habitEmoji">🎨 Icon</label>
+            <input type="text" id="habitEmoji" class="emoji-input" placeholder="😊" maxlength="2" value="⭐" />
+          </div>
+          <div class="meta-field">
+            <label for="habitFrequency">🔄 Frequency</label>
+            <select id="habitFrequency" class="meta-select">
+              <option value="daily">Daily</option>
+              <option value="weekly">Weekly</option>
+              <option value="custom">Custom</option>
+            </select>
+          </div>
+        </div>
+        <div class="note-meta-row">
+          <div class="meta-field">
+            <label for="habitStartDate">📅 Start Date</label>
+            <input type="date" id="habitStartDate" class="meta-select" />
+          </div>
+        </div>
+        <div class="meta-field">
+          <label>
+            <input type="checkbox" id="habitReminder" />
+            Enable reminders
+          </label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-ghost" id="habitModalCancel">Cancel</button>
+        <button class="btn-primary" id="habitModalSave">Create Habit</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ SETTINGS MODAL ══════════ -->
+  <div class="modal-backdrop hidden" id="settingsModalBackdrop">
+    <div class="modal settings-modal" role="dialog" aria-modal="true" aria-label="Settings">
+      <div class="modal-header">
+        <span class="modal-title-label">⚙️ Settings</span>
+        <button class="modal-close" id="settingsModalClose" aria-label="Close">✕</button>
+      </div>
+      <div class="modal-body settings-body">
+        
+        <!-- Notifications Section -->
+        <div class="settings-section">
+          <h3>🔔 Notifications & Reminders</h3>
+          <div class="settings-item">
+            <label>
+              <input type="checkbox" id="notificationsEnabled" checked />
+              Enable desktop notifications
+            </label>
+          </div>
+          <div class="settings-item">
+            <label>
+              <input type="checkbox" id="emailReminders" />
+              Email reminders
+            </label>
+            <input type="email" id="reminderEmail" class="settings-input" placeholder="your@email.com" disabled />
+          </div>
+          <div class="settings-item">
+            <label for="reminderTime">Daily reminder time</label>
+            <input type="time" id="reminderTime" class="settings-input" value="09:00" />
+          </div>
+        </div>
+
+        <!-- Sync Section -->
+        <div class="settings-section">
+          <h3>☁️ Cloud Sync</h3>
+          <div class="settings-item">
+            <label>
+              <input type="checkbox" id="autoSync" checked />
+              Auto-sync across devices
+            </label>
+            <p class="settings-hint">Requires Firebase account</p>
+          </div>
+          <button class="btn-secondary" id="syncNowBtn">Sync Now</button>
+          <p class="settings-hint" id="syncStatus">Last synced: just now</p>
+        </div>
+
+        <!-- Storage Section -->
+        <div class="settings-section">
+          <h3>💾 Storage</h3>
+          <div class="storage-bar">
+            <div class="storage-used" id="storageUsed" style="width: 30%"></div>
+          </div>
+          <p class="settings-hint" id="storageInfo">2.5 MB of 10 MB used</p>
+          <button class="btn-secondary" id="exportBtn">📥 Export Data</button>
+          <button class="btn-danger-sm" id="clearCacheBtn">🗑️ Clear Cache</button>
+        </div>
+
+        <!-- PWA Section -->
+        <div class="settings-section">
+          <h3>📱 App</h3>
+          <button class="btn-secondary" id="installAppBtn">Install as App</button>
+          <p class="settings-hint">Install NoteFlow on your home screen</p>
+        </div>
+
+        <!-- Data Management -->
+        <div class="settings-section">
+          <h3>📊 Data Management</h3>
+          <button class="btn-secondary" id="backupBtn">📦 Create Backup</button>
+          <button class="btn-secondary" id="restoreBtn">📋 Restore from Backup</button>
+          <button class="btn-danger" id="deleteAllBtn">🗑️ Delete All Data</button>
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button class="btn-primary" id="settingsModalClose2">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ CONFIRM MODAL ══════════ -->
+  <div class="modal-backdrop hidden" id="confirmBackdrop">
+    <div class="modal confirm-modal" role="dialog" aria-modal="true">
+      <div class="modal-body" style="text-align:center;padding:2rem 1.5rem 1rem">
+        <div style="font-size:2.5rem;margin-bottom:.75rem" id="confirmIllo">🗑️</div>
+        <p class="confirm-msg" id="confirmMsg">Are you sure?</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-ghost" id="confirmCancel">Cancel</button>
+        <button class="btn-danger" id="confirmOk">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ TOAST ══════════ -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Scripts -->
+  <script src="calendar.js"></script>
+  <script src="local-app.js"></script>
+  <script src="features-starter.js"></script>
+
+</body>
+</html>
