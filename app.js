@@ -158,7 +158,7 @@ import { firebaseConfig, USE_LOCAL_AUTH } from "./firebase-config.js";
     calDayTitle: $("#calDayTitle"),
     calDayNotes: $("#calDayNotes"),
     calDayEmpty: $("#calDayEmpty"),
-    authBackdrop: $("#authBackdrop"),
+    authScreen: $("#authScreen"),
     authForm: $("#authForm"),
     authNameField: $("#authNameField"),
     authName: $("#authName"),
@@ -418,8 +418,8 @@ import { firebaseConfig, USE_LOCAL_AUTH } from "./firebase-config.js";
   }
 
   function setSignedInUI(user) {
-    if (els.authBackdrop) els.authBackdrop.classList.add("hidden");
-    if (els.appShell) els.appShell.classList.remove("auth-locked");
+    if (els.authScreen) els.authScreen.classList.add("hidden");
+    if (els.appShell) els.appShell.classList.remove("hidden");
     if (els.logoutBtn) els.logoutBtn.classList.remove("hidden");
     if (els.userChip) {
       els.userChip.classList.remove("hidden");
@@ -428,8 +428,8 @@ import { firebaseConfig, USE_LOCAL_AUTH } from "./firebase-config.js";
   }
 
   function setSignedOutUI() {
-    if (els.authBackdrop) els.authBackdrop.classList.remove("hidden");
-    if (els.appShell) els.appShell.classList.add("auth-locked");
+    if (els.authScreen) els.authScreen.classList.remove("hidden");
+    if (els.appShell) els.appShell.classList.add("hidden");
     if (els.logoutBtn) els.logoutBtn.classList.add("hidden");
     if (els.userChip) els.userChip.classList.add("hidden");
     setSyncStatus("Offline");
